@@ -82,26 +82,31 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
     }
 
     // Tokenize dirName and traverse
+    if (strlen(dirName) == 0) {
+        return cwd;
+    }
+    
     char temp[128];
     strcpy(temp, dirName);
     char* token = strtok(temp, "/");
     while (token != NULL) {
-        struct NODE* child = current->childPtr;
-        int found = 0;
-        while (child != NULL) {
-            if (strcmp(child->name, token) == 0 && child->fileType == 'D') {
-                current = child;
-                found = 1;
-                break;
-            }
-            child = child->siblingPtr;
+    struct NODE* child = current->childPtr;
+    int found = 0;
+    while (child != NULL) {
+        if (strcmp(child->name, token) == 0 && child->fileType == 'D') {
+            current = child;
+            found = 1;
+            break;
         }
-        if (!found) {
-            printf("ERROR: directory %s does not exist\n", token);
-            return NULL;
-        }
-        token = strtok(NULL, "/");
+        child = child->siblingPtr;
     }
+    if (!found) {
+        printf("ERROR: directory %s does not exist\n", token);
+        return NULL;
+    }
+    token = strtok(NULL, "/");
+}
+
 
     return current;
 }
