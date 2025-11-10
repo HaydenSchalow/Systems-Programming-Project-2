@@ -31,9 +31,9 @@ void mkdir(char pathName[]){
     }
 
     struct NODE* newNode = (struct NODE*)malloc(sizeof(struct NODE));
-    strcpy(newNode->name, BaseName);
+    strcpy(newNode->name, baseName);
     newNode->fileType = 'D';
-    newNode->parentPTR = parent;
+    newNode->parentPtr = parent;
     newNode->childPtr = NULL;
     newNode->siblingPtr = NULL;
 
@@ -48,7 +48,7 @@ void mkdir(char pathName[]){
     }
 
     printf("MKDIR SUCCESS: node %s successfully created\n", baseName);
-}
+
 
     
     //printf("TO BE IMPLEMENTED\n");
@@ -68,7 +68,7 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
     if (strcmp(pathName, "/") == 0) {
         strcpy(dirName, "/");
         strcpy(baseName, "");
-        return root:
+        return root;
     }
     
     char* lastSlash = strrchr(pathName, '/');
@@ -112,7 +112,7 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
     }
 
     return current;
-}
+
     //
-    return NULL;
+    //return NULL;
 }
