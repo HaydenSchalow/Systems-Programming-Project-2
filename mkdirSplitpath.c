@@ -4,12 +4,7 @@ extern struct NODE* root;
 extern struct NODE* cwd;
 
 //make directory
-void mkdir(char pathName[]){
-
-    // TO BE IMPLEMENTED
-    //
-    // YOUR CODE TO REPLACE THE PRINTF FUNCTION BELOW
-
+void mkdir(char pathName[]) {
     if (strcmp(pathName, "/") == 0 || strlen(pathName) == 0) {
         printf("MKDIR ERROR: no path provided\n");
         return;
@@ -18,9 +13,11 @@ void mkdir(char pathName[]){
     char baseName[64], dirName[128];
     struct NODE* parent = splitPath(pathName, baseName, dirName);
     if (parent == NULL) {
+        // Error already printed by splitPath
         return;
     }
 
+    // Check if baseName already exists under parent
     struct NODE* child = parent->childPtr;
     while (child != NULL) {
         if (strcmp(child->name, baseName) == 0 && child->fileType == 'D') {
@@ -30,6 +27,7 @@ void mkdir(char pathName[]){
         child = child->siblingPtr;
     }
 
+    // Create new directory node
     struct NODE* newNode = (struct NODE*)malloc(sizeof(struct NODE));
     strcpy(newNode->name, baseName);
     newNode->fileType = 'D';
@@ -37,52 +35,45 @@ void mkdir(char pathName[]){
     newNode->childPtr = NULL;
     newNode->siblingPtr = NULL;
 
+    // Insert into parent's child list
     if (parent->childPtr == NULL) {
         parent->childPtr = newNode;
     } else {
         struct NODE* last = parent->childPtr;
         while (last->siblingPtr != NULL) {
-            last->siblingPtr;
+            last = last->siblingPtr;
         }
         last->siblingPtr = newNode;
     }
 
     printf("MKDIR SUCCESS: node %s successfully created\n", baseName);
-
-
-    
-    //printf("TO BE IMPLEMENTED\n");
-
-    return;
 }
 
 //handles tokenizing and absolute/relative pathing options
-struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
-
-    // TO BE IMPLEMENTED
-    // NOTE THAT WITHOUT COMPLETING THIS FUNCTION CORRECTLY
-    // rm, rmdir, ls, cd, touch COMMANDS WILL NOT EXECUTE CORRECTLY
-    // SEE THE PROVIDED SOLUTION EXECUTABLE TO SEE THEIR EXPECTED BEHAVIOR
-
-    // YOUR CODE HERE
+struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
+    // Handle root case
     if (strcmp(pathName, "/") == 0) {
         strcpy(dirName, "/");
         strcpy(baseName, "");
         return root;
     }
-    
+
+    // Find last slash to split baseName and dirName
     char* lastSlash = strrchr(pathName, '/');
     if (lastSlash == NULL) {
+        // No slash: relative path in cwd
         strcpy(dirName, "");
         strcpy(baseName, pathName);
         return cwd;
     }
-    
+
+    // Extract baseName and dirName
     strcpy(baseName, lastSlash + 1);
     size_t dirLen = lastSlash - pathName;
     strncpy(dirName, pathName, dirLen);
-    dirName[dirLen] = '\0';
+    dirName[dirLen] = '\0'; // null-terminate
 
+    // Start traversal
     struct NODE* current;
     if (pathName[0] == '/') {
         current = root;
@@ -90,6 +81,7 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
         current = cwd;
     }
 
+    // Tokenize dirName and traverse
     char temp[128];
     strcpy(temp, dirName);
     char* token = strtok(temp, "/");
@@ -111,8 +103,5 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
         token = strtok(NULL, "/");
     }
 
-    //return current;
-
-    //
-    return NULL;
+    return current;
 }
