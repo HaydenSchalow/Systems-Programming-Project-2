@@ -111,8 +111,8 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
         token = strtok(NULL, "/");
     }
 
-    return current;
+    //return current;
 
     //
-    //return NULL;
+    return NULL;
 }
