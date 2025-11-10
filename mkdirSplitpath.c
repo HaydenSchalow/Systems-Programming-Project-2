@@ -19,13 +19,14 @@ void mkdir(char pathName[]) {
 
     // Check if baseName already exists under parent
     struct NODE* child = parent->childPtr;
-    while (child != NULL) {
-        if (strcmp(child->name, baseName) == 0 && child->fileType == 'D') {
-            printf("MKDIR ERROR: directory %s already exists\n", baseName);
-            return;
-        }
-        child = child->siblingPtr;
+while (child != NULL) {
+    if (strcmp(child->name, baseName) == 0 && child->fileType == 'D') {
+        printf("MKDIR ERROR: directory %s already exists\n", baseName);
+        return;
     }
+    child = child->siblingPtr;
+}
+
 
     // Create new directory node
     struct NODE* newNode = (struct NODE*)malloc(sizeof(struct NODE));
@@ -60,12 +61,11 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
 
     // Find last slash to split baseName and dirName
     char* lastSlash = strrchr(pathName, '/');
-    if (lastSlash == NULL) {
-        // No slash: relative path in cwd
-        strcpy(dirName, "");
-        strcpy(baseName, pathName);
-        return cwd;
-    }
+if (lastSlash == NULL) {
+    strcpy(dirName, "");
+    strcpy(baseName, pathName);
+    return cwd;
+}
 
     // Extract baseName and dirName
     strcpy(baseName, lastSlash + 1);
@@ -89,7 +89,7 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
     char temp[128];
     strcpy(temp, dirName);
     char* token = strtok(temp, "/");
-    while (token != NULL) {
+while (token != NULL) {
     struct NODE* child = current->childPtr;
     int found = 0;
     while (child != NULL) {
@@ -106,7 +106,6 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
     }
     token = strtok(NULL, "/");
 }
-
 
     return current;
 }
