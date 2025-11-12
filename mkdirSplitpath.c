@@ -6,7 +6,7 @@
 // The root and cwd nodes are defined in main.c as extern
 extern struct NODE *root, *cwd;
 
-// Helper: find a child node by name under a given directory
+// Find a child node by name under a given directory
 struct NODE* findChild(struct NODE* parent, const char* name) {
     struct NODE* cur = parent->childPtr;
     while (cur) {
@@ -17,13 +17,8 @@ struct NODE* findChild(struct NODE* parent, const char* name) {
     return NULL;
 }
 
-/*
- * splitPath()
- * Given pathName, separate it into dirName (the directory path)
- * and baseName (the final name in the path).
- * Return a pointer to the NODE representing the parent directory of baseName.
- * Print error if a directory in the path doesn't exist.
- */
+
+//Return a pointer to the NODE representing the parent directory of baseName, or print error if a directory in the path doesn't exist.
 struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
     // Handle root edge case
     if (strcmp(pathName, "/") == 0) {
@@ -81,10 +76,8 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
     return current;
 }
 
-/*
- * mkdir()
- * Create a directory node at the given pathName.
- */
+
+ // Create a directory node at the given pathName.
 void mkdir(char* pathName) {
     if (strcmp(pathName, "/") == 0) {
         printf("MKDIR ERROR: no path provided\n");
