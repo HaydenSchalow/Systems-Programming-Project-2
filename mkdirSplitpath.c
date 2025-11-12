@@ -13,22 +13,20 @@ void mkdir(char pathName[]) {
     char baseName[64], dirName[128];
     struct NODE* parent = splitPath(pathName, baseName, dirName);
     if (parent == NULL) {
-        // Error already printed by splitPath
         return;
     }
 
-    // Check if baseName already exists under parent
+    // Check for duplicate
     struct NODE* child = parent->childPtr;
-while (child != NULL) {
-    if (strcmp(child->name, baseName) == 0 && child->fileType == 'D') {
-        printf("MKDIR ERROR: directory %s already exists\n", baseName);
-        return;
+    while (child != NULL) {
+        if (strcmp(child->name, baseName) == 0 && child->fileType == 'D') {
+            printf("MKDIR ERROR: directory %s already exists\n", baseName);
+            return;
+        }
+        child = child->siblingPtr;
     }
-    child = child->siblingPtr;
-}
 
-
-    // Create new directory node
+    // Create new node
     struct NODE* newNode = (struct NODE*)malloc(sizeof(struct NODE));
     strcpy(newNode->name, baseName);
     newNode->fileType = 'D';
@@ -50,78 +48,61 @@ while (child != NULL) {
     printf("MKDIR SUCCESS: node %s successfully created\n", baseName);
 }
 
+
+
 //handles tokenizing and absolute/relative pathing options
 struct NODE* splitPath(char* pathName, char* baseName, char* dirName) {
-    // Handle root case
     if (strcmp(pathName, "/") == 0) {
         strcpy(dirName, "/");
         strcpy(baseName, "");
         return root;
     }
 
-    // Find last slash to split baseName and dirName
+    // Split path into dirName and baseName
     char* lastSlash = strrchr(pathName, '/');
-if (lastSlash == NULL) {
-    strcpy(dirName, "");
-    strcpy(baseName, pathName);
-    return cwd;
-}
+    if (lastSlash == NULL) {
+        strcpy(dirName, "");
+        strcpy(baseName, pathName);
+        return cwd;
+    }
 
-    // Extract baseName and dirName
     strcpy(baseName, lastSlash + 1);
     size_t dirLen = lastSlash - pathName;
     strncpy(dirName, pathName, dirLen);
-    dirName[dirLen] = '\0'; // null-terminate
+    dirName[dirLen] = '\0';
 
     // Start traversal
-    struct NODE* current;
-    if (pathName[0] == '/') {
-        current = root;
-    } else {
-        current = cwd;
-    }
+    struct NODE* current = (pathName[0] == '/') ? root : cwd;
 
-    // Tokenize dirName and traverse
     if (strlen(dirName) == 0) {
-        return cwd;
+        return current;
     }
-    
-char temp[128];
-strcpy(temp, dirName);
 
-// If dirName is empty, return cwd
-if (strlen(dirName) == 0) {
-    return cwd;
-}
+    char temp[128];
+    strcpy(temp, dirName);
+    char* token = strtok(temp, "/");
 
-// Start from root or cwd depending on path type
-struct NODE* current = (pathName[0] == '/') ? root : cwd;
+    while (token != NULL) {
+        struct NODE* child = current->childPtr;
+        int found = 0;
 
-char* token = strtok(temp, "/");
-while (token != NULL) {
-    printf("DEBUG: Looking for directory '%s' under '%s'\n", token, current->name);
-
-    struct NODE* child = current->childPtr;
-    int found = 0;
-
-    while (child != NULL) {
-        printf("DEBUG: Checking child '%s' (type %c)\n", child->name, child->fileType);
-        if (strcmp(child->name, token) == 0 && child->fileType == 'D') {
-            current = child;
-            found = 1;
-            break;
+        while (child != NULL) {
+            if (strcmp(child->name, token) == 0 && child->fileType == 'D') {
+                current = child;
+                found = 1;
+                break;
+            }
+            child = child->siblingPtr;
         }
-        child = child->siblingPtr;
+
+        if (!found) {
+            printf("ERROR: directory %s does not exist\n", token);
+            return NULL;
+        }
+
+        token = strtok(NULL, "/");
     }
-
-    if (!found) {
-        printf("ERROR: directory %s does not exist\n", token);
-        return NULL;
-    }
-
-    token = strtok(NULL, "/");
-}
-
 
     return current;
 }
+
